@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import 'package:shimmer/shimmer.dart'; // Import shimmer package
 
@@ -22,6 +23,7 @@ class _WebViewPageState extends State<WebViewPage> {
   void initState() {
     super.initState();
     controller = WebViewController()
+      ..setUserAgent("Mozilla/5.0 (Linux; Android 10; SM-G975F) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.106 Mobile Safari/537.36") // Set User Agent
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
       ..setNavigationDelegate(
         NavigationDelegate(
@@ -41,6 +43,20 @@ class _WebViewPageState extends State<WebViewPage> {
               });
             }
           },
+          onNavigationRequest: (NavigationRequest request) {
+              if (request.url.startsWith('https://wa.me/')) {
+                launchUrl(Uri.parse(request.url), mode: LaunchMode.externalApplication);
+                return NavigationDecision.prevent;
+              }
+              else if (request.url.startsWith('tel:')) {
+                launchUrl(Uri.parse(request.url), mode: LaunchMode.externalApplication);
+                return NavigationDecision.prevent;
+              }
+              return NavigationDecision.navigate;
+
+          },
+
+
         ),
       )
       ..loadRequest(
